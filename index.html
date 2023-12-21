@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Click Counter</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  
+  <style>
+  	/* Styles for the button and click count display */
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+p {
+  font-size: 18px;
+}
+  	</style>
+</head>
+<body>
+  <button id="clickButton">Click me!</button>
+  <p>Click count: <span id="clickCount">0</span></p>
+  
+  <script>
+// JavaScript to track button clicks, update count, and store in a JSON file
+let count;
+
+// Check if the JSON file exists
+fetch('clickCount.json')
+  .then(response => {
+    // If the file exists, retrieve the click count
+    if (response.ok) {
+      return response.json();
+    } else {
+      // If the file doesn't exist, initialize count to 0
+      count = 0;
+      return Promise.resolve({});
+    }
+  })
+  .then(data => {
+    // Update count if retrieved from JSON
+    count = data.clickCount || 0;
+    const clickButton = document.getElementById('clickButton');
+    const clickCount = document.getElementById('clickCount');
+
+    // Update initial count display
+    clickCount.textContent = count;
+
+    clickButton.addEventListener('click', function() {
+      count++;
+      clickCount.textContent = count;
+
+      // Update JSON file with the new count
+      const jsonData = { clickCount: count };
+      const jsonDataString = JSON.stringify(jsonData, null, 2);
+      
+      // Save the JSON file
+      fetch('clickCount.json', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: jsonDataString
+      });
+    });
+  })
+  .catch(error => console.error('Error:', error));
+</script>
+</body>
+</html>
