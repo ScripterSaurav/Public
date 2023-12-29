@@ -1,0 +1,28 @@
+name: Update Data JSON
+
+on:
+  push:
+    branches:
+      - main  # Change this to your branch name
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read title from index.html
+        id: getTitle
+        run: echo "::set-output name=title::$(grep -oP '(?<=<title>).*?(?=</title>)' index.html)"
+
+      - name: Write title to data.json
+        run: echo '{"title": "${{ steps.getTitle.outputs.title }}"}' > data.json
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.json
+          git commit -m "Update title in data.json" || echo "No changes to commit"
