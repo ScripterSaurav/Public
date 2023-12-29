@@ -25,4 +25,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add data.json
-          git commit -m "Update title in data.json" || echo "No changes to commit"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update title in data.json"
+          git push
